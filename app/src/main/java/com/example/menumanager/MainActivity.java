@@ -1,21 +1,23 @@
 package com.example.menumanager;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.Toolbar;
 
-import android.content.res.ColorStateList;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements View.OnLongClickListener, ActionMode.Callback {
+public class MainActivity extends AppCompatActivity implements View.OnLongClickListener, ActionMode.Callback, View.OnClickListener {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
         final View root = findViewById(R.id.activity_main__cl__root);
         root.setOnLongClickListener(this);
+        root.setOnClickListener(this);
+
+        final Toolbar toolbar = findViewById(R.id.activity_main__tb__main);
+        setSupportActionBar(toolbar);
     }
 
     @Override
@@ -85,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     @Override
     public boolean onLongClick(View v) {
         if (v.getId() == R.id.activity_main__cl__root) {
-            startActionMode(this);
+            startSupportActionMode(this);
             return true;
         } else {
             return false;
@@ -105,28 +111,44 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+    public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
         TextView helloWorld = findViewById(R.id.activity_main__tv__title);
 
         if (item.getItemId() == R.id.floating_menu__item__add) {
-            helloWorld.setTextColor(Color.BLUE);
-            Toast.makeText(this, "Add", Toast.LENGTH_SHORT).show();
+            PopupMenu popupMenu = new PopupMenu(this, findViewById(R.id.floating_menu__item__add));
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.menu_popup, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    Toast.makeText(MainActivity.this, "From pop-up!", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
+            popupMenu.show();
         } else if (item.getItemId() == R.id.floating_menu__item__like) {
             helloWorld.setTextColor(Color.GREEN);
             Toast.makeText(this, "Like :)", Toast.LENGTH_SHORT).show();
+            mode.finish();
         } else if (item.getItemId() == R.id.floating_menu__item__dislike) {
             helloWorld.setTextColor(Color.RED);
             Toast.makeText(this, "Dislike :(", Toast.LENGTH_SHORT).show();
+            mode.finish();
         } else {
             return false;
         }
 
-        mode.finish();
         return true;
     }
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(this, SecondActivity.class);
+        startActivity(intent);
     }
 }
