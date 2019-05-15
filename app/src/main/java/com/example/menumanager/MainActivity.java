@@ -1,8 +1,12 @@
 package com.example.menumanager;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,7 +15,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnLongClickListener, ActionMode.Callback {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +24,9 @@ public class MainActivity extends AppCompatActivity {
 
         final TextView textView = findViewById(R.id.activity_main__tv__title);
         registerForContextMenu(textView);
+
+        final View root = findViewById(R.id.activity_main__cl__root);
+        root.setOnLongClickListener(this);
     }
 
     @Override
@@ -31,11 +38,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        TextView helloWorld = findViewById(R.id.activity_main__tv__title);
+
         if (item.getItemId() == R.id.menu_main__item__copy) {
             Toast.makeText(this, "Copy", Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.menu_main__item__cut) {
+            helloWorld.setTextColor(Color.WHITE);
             Toast.makeText(this, "Cut", Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.menu_main__item__paste) {
+            helloWorld.setTextColor(Color.BLACK);
             Toast.makeText(this, "Paste", Toast.LENGTH_SHORT).show();
         } else {
             return super.onOptionsItemSelected(item);
@@ -49,5 +60,73 @@ public class MainActivity extends AppCompatActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.floating_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        TextView helloWorld = findViewById(R.id.activity_main__tv__title);
+
+        if (item.getItemId() == R.id.floating_menu__item__add) {
+            helloWorld.setTextColor(Color.BLUE);
+            Toast.makeText(this, "Add", Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.floating_menu__item__like) {
+            helloWorld.setTextColor(Color.GREEN);
+            Toast.makeText(this, "Like :)", Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.floating_menu__item__dislike) {
+            helloWorld.setTextColor(Color.RED);
+            Toast.makeText(this, "Dislike :(", Toast.LENGTH_SHORT).show();
+        } else {
+            return super.onContextItemSelected(item);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        if (v.getId() == R.id.activity_main__cl__root) {
+            startActionMode(this);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.floating_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        TextView helloWorld = findViewById(R.id.activity_main__tv__title);
+
+        if (item.getItemId() == R.id.floating_menu__item__add) {
+            helloWorld.setTextColor(Color.BLUE);
+            Toast.makeText(this, "Add", Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.floating_menu__item__like) {
+            helloWorld.setTextColor(Color.GREEN);
+            Toast.makeText(this, "Like :)", Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.floating_menu__item__dislike) {
+            helloWorld.setTextColor(Color.RED);
+            Toast.makeText(this, "Dislike :(", Toast.LENGTH_SHORT).show();
+        } else {
+            return false;
+        }
+
+        mode.finish();
+        return true;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+
     }
 }
